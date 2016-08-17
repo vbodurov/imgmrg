@@ -1,4 +1,5 @@
-﻿namespace imgmrg.Models
+﻿// ReSharper disable InconsistentNaming
+namespace imgmrg.Models
 {
     public class ConfigData
     {
