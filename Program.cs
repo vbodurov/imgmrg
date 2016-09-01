@@ -16,7 +16,12 @@ namespace imgmrg
             {
                 var color = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("ERROR: "+ex);
+                var i = 0;
+                do
+                {
+                    Console.WriteLine((++i)+" ERROR: "+ex);
+                    ex = ex.InnerException;
+                } while (ex != null);
                 Console.ForegroundColor = color;
             }
             Console.WriteLine("DONE");

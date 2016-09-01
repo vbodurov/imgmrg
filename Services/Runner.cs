@@ -19,19 +19,46 @@ namespace imgmrg.Services
         void IRunner.Execute()
         {
             var sw = Stopwatch.StartNew();
-
-            var config = GetConfig();
+            ConfigData config = null;
+            try
+            {
+                config = GetConfig();
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Error retrieving configuration: "+ex.Message, ex);
+            }
 
             foreach (var t in config.transformations)
             {
-                var originalRGB = Image.FromFile(t.input_rgb);
-                var originalA = Image.FromFile(t.input_a);
-                var output = Merge(originalRGB, originalA);
-                if (File.Exists(t.output))
+                if(!File.Exists(t.input_rgb)) throw new ApplicationException("Cannot find RGB file '"+t.input_rgb+"'");
+                if(!File.Exists(t.input_a)) throw new ApplicationException("Cannot find A file '"+t.input_a+"'");
+                if(string.IsNullOrEmpty(t.output)) throw new ApplicationException("No output file specified for '"+t.input_a+"'");
+            }
+
+            foreach (var t in config.transformations)
+            {
+                try
                 {
-                    File.Delete(t.output);
+                    var originalRgb = Image.FromFile(t.input_rgb);
+                    var originalA = Image.FromFile(t.input_a);
+                    var output = Merge(originalRgb, originalA);
+                    if (File.Exists(t.output))
+                    {
+                        File.Delete(t.output);
+                    }
+                    var outDir = Path.GetDirectoryName(t.output);
+                    if (outDir!= null && !Directory.Exists(outDir))
+                    {
+                        Directory.CreateDirectory(outDir);
+                    }
+                    output.Save(t.output);
                 }
-                output.Save(t.output);
+                catch (Exception ex)
+                {
+                    throw new ApplicationException("Error creating file from  RGB:"+t.input_rgb+" A:"+t.input_a, ex);
+                }
+                
                 Console.WriteLine("Output:"+t.output);
             }
 
