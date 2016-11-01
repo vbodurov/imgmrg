@@ -53,6 +53,19 @@ namespace imgmrg.Services
                         Directory.CreateDirectory(outDir);
                     }
                     output.Save(t.output);
+
+                    if (!string.IsNullOrEmpty(t.copy_from) && 
+                        !string.IsNullOrEmpty(t.copy_to) &&
+                        t.copy_from != t.copy_to)
+                    {
+                        if (File.Exists(t.copy_to))
+                        {
+                            File.Delete(t.copy_to);
+                        }
+
+                        File.Copy(t.copy_from,t.copy_to);
+                        Console.WriteLine("Copied:"+t.copy_to);
+                    }
                 }
                 catch (Exception ex)
                 {
